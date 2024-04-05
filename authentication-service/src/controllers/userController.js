@@ -17,11 +17,3 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-exports.checkAuth = async (req, res) => {
-  try {
-    res.status(200).json({user: req.user, message: 'Successfully Logged In' });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-};
