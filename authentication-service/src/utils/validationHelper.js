@@ -11,6 +11,5 @@ const validateRegistration = [
 ];
 
 module.exports = {
-    validateClient,
     validateRegistration
 };

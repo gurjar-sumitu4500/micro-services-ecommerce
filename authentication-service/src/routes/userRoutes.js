@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getUserProfile, checkAuth } = require("../controllers/userController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const { authMiddleware } = require("../middlewares/authMiddleware");
 
 // Protected route for user profile
 router.get("/profile", authMiddleware, getUserProfile);

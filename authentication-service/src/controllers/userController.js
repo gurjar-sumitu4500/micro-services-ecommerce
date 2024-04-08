@@ -3,7 +3,7 @@
 const User = require("../models/User");
 
 // Controller function to get user profile
-exports.getUserProfile = async (req, res) => {
+module.exports.getUserProfile = async (req, res) => {
   try {
     // Find user by ID
     const user = await User.findById(req.user.id).select("-password");
@@ -16,4 +16,12 @@ exports.getUserProfile = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+module.exports.checkAuth = async (req, res) => {
+  try {
+    return res.status(200).json({ msg: "Success" });
+  } catch (err) {
+    res.status(500).send('Internal Server Error');
+  }
+}
 

@@ -3,17 +3,9 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
-  logoutUser,
-  getUserProfile
+  logoutUser
 } = require("../controllers/authController");
-const authMiddleware = require("../middlewares/authMiddleware");
-const { validationResult } = require('express-validator');
-const { validateOAuthParams } = require('../middlewares/authMiddleware');
-const { createAuthorizationCode } = require('../services/authService');
-const AuthorizationCode = require('../models/AuthorizationCode');
-const RefreshToken = require('../models/RefreshToken');
-const jwt = require('jsonwebtoken');
-const { validateClient, validateRegistration } = require('../utils/validationHelper');
+const { validateRegistration } = require('../utils/validationHelper');
 
 // Route for user registration
 router.post("/register", validateRegistration, registerUser);
