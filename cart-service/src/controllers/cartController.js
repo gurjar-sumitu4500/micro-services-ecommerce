@@ -1,16 +1,12 @@
-// productController.js
-
 const Cart = require('../models/Cart');
-const jwt = require("jsonwebtoken");
+const ObjectId = require('mongoose').Types.ObjectId;
 
-// Controller function to handle product creation
 exports.createCart = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { id: userId } = req.user;
     const cart = new Cart({
-      cartId: new ObjectID(),
-      userId,
-      products: [],
+      userId: new ObjectId(userId),
+      products: JSON.stringify([]),
       totalAmount: 0,
       version: 0
     })
@@ -22,7 +18,6 @@ exports.createCart = async (req, res) => {
   }
 };
 
-// Controller function to handle product retrieval
 exports.getCart = async (req, res) => {
   try {
     const cart = await Cart.find();
@@ -33,38 +28,41 @@ exports.getCart = async (req, res) => {
   }
 };
 
-// Controller function to handle product update
 exports.addToCart = async (req, res) => {
   try {
     const { cartId } = req.params;
     const { products } = req.body;
-    const prevCart = await Cart.find({ cartId });
-    let newCart = { //TODO
-      ...prevCart,
-      products: [
-        ...products
-      ]
-    }
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      { name, description, price, category },
-      { new: true }
+    const prevCart = await Cart.find({ _id: cartId });
+    let updatedProducts = (JSON.parse(prevCart?.products).concat(products)).reduce((acc, curr) => {
+      if (curr?.productId in acc) {
+        acc[curr?.productId].count += 1;
+      } else {
+        acc[curr?.productId].count = 1;
+      }
+      return acc[curr?.productId];
+    }, []);
+
+    let updatedVersion = prevCart?.version + 1;
+    let updatedAmount = prevCart?.amount + (products.reduce((a, c) => a + c.price, 0) || 0);
+
+    const updatedCart = await Cart.findByIdAndUpdate(
+      cartId,
+      { products: JSON.stringify(updatedProducts), version: updatedVersion, amount: updatedAmount }
     );
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
+    if (!updatedCart) {
+      return res.status(404).json({ error: 'Cart not found' });
     }
-    res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+    res.status(200).json({ message: 'Cart updated successfully', cart: updatedCart });
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error updating Cart:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Controller function to handle product deletion
 exports.deleteCart = async (req, res) => {
   try {
     const { cartId } = req.params;
-    const deletedCart = await Cart.findByIdAndDelete(cartId);
+    const deletedCart = await Cart.findByIdAndDelete({ _id: cartId });
     if (!deletedCart) {
       return res.status(404).json({ error: 'Cart not found' });
     }

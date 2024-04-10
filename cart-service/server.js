@@ -37,7 +37,7 @@ mongoose
     process.exit(1); // Exit the process if database connection fails
   });
 
-app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
 app.use(errorHandler);
 
 // Start the server
